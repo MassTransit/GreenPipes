@@ -1,0 +1,494 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Filters · GreenPipes</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-expandable-chapters/expandable-chapters.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+        <link rel="stylesheet" href="../build/gitbook.css">
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    
+    <link rel="prev" href="contexts.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        <li class="header">Overview</li>
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="atoms.html">
+            
+                <a href="atoms.html">
+            
+                    
+                    Atoms
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="contexts.html">
+            
+                <a href="contexts.html">
+            
+                    
+                    Contexts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.4" data-path="filters.html">
+            
+                <a href="filters.html">
+            
+                    
+                    Filters
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+        
+        <li class="header">Usage</li>
+        
+        
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Filters</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="filters">Filters</h1>
+<p>A filter in GreenPipes is a middleware component that performs a specific function. You can think of them as HTTP Modules in ASP.Net or the Filters in ASP.Net MVC. All of these types serve to do the same general thing, which is to provide a common service to all requests that pass through the pipeline. Because its a common service, each filter should strongly adhere to the <a href="http://en.wikipedia.org/wiki/Single_responsibility_principle" target="_blank">single responsibility principle</a> -- do one thing and one thing only. This fine-grained approach ensures that developers are able to opt-in to each behavior without including unnecessary or unwatched functionality.</p>
+<blockquote>
+<p>The overhead of having many fine-grained filters is minimal as each filter does NOT have to do any casting of objects and amounts to nothing more fancy than a method call. The throughput of various filter stacks can be testing in the <code>gpbench</code> app that comes with the project if you would like to test any combination of filters.</p>
+</blockquote>
+<h2 id="included-filters">Included Filters</h2>
+<ul>
+<li>Circuit Breaker</li>
+<li>Concurrency Limit</li>
+<li>Log</li>
+<li>Rate Limit</li>
+<li>Repeat</li>
+<li>Rescue</li>
+<li>Retry</li>
+<li>and more (the full list is located at <a href="https://github.com/phatboyg/GreenPipes/tree/master/src/GreenPipes/Filters" target="_blank">https://github.com/phatboyg/GreenPipes/tree/master/src/GreenPipes/Filters</a>)</li>
+</ul>
+<h2 id="writing-your-own-filter">Writing your own filter</h2>
+<p>GreenPipes itself follows a fairly common pattern when creating a new filter. Below I will demonstrate writing a naive authorization filter. This filter will inspect the payload context and look for an IPrincipal, if it finds one, it will assert that the principal has one of the required roles. If it does, it will let the request pass, otherwise it will divert and send the request down an Unauthorized pipeline.</p>
+<ol>
+<li>Create the Filter itself, which is a class that implements <code>IFilter<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>T</span><span class="token punctuation">&gt;</span></span></code>.</li>
+</ol>
+<pre class="language-"><code class="lang-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AuthorizationFilter</span><span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> <span class="token punctuation">:</span> IFilter<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span>
+        <span class="token keyword">where</span> T <span class="token punctuation">:</span> <span class="token keyword">class</span><span class="token punctuation">,</span> PipeContext
+    <span class="token punctuation">{</span>
+        <span class="token keyword">readonly</span> IPipe<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> _unauthPipe<span class="token punctuation">;</span>
+        <span class="token keyword">readonly</span> <span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> _allowedRoles<span class="token punctuation">;</span>
+
+        <span class="token keyword">public</span> <span class="token function">AuthorizationFilter</span><span class="token punctuation">(</span>IPipe<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> unauthPipe<span class="token punctuation">,</span> <span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> allowedRoles<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            _unauthPipe <span class="token operator">=</span> unauthPipe<span class="token punctuation">;</span>
+            _allowedRoles <span class="token operator">=</span> allowedRoles<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">Probe</span><span class="token punctuation">(</span>ProbeContext context<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">var</span> scope <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">CreateScope</span><span class="token punctuation">(</span><span class="token string">&quot;AuthorizationFilter&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            scope<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token string">&quot;allowed-roles&quot;</span><span class="token punctuation">,</span> _allowedRoles<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            _unauthPipe<span class="token punctuation">.</span><span class="token function">Probe</span><span class="token punctuation">(</span>scope<span class="token punctuation">.</span><span class="token function">CreateScope</span><span class="token punctuation">(</span><span class="token string">&quot;unauth-pipe&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">public</span> <span class="token keyword">async</span> Task <span class="token function">Send</span><span class="token punctuation">(</span>T context<span class="token punctuation">,</span> IPipe<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> next<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            IPrincipal prin<span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">TryGetPayload</span><span class="token punctuation">(</span><span class="token keyword">out</span> prin<span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>_allowedRoles<span class="token punctuation">.</span><span class="token function">Any</span><span class="token punctuation">(</span>r <span class="token operator">=</span><span class="token operator">&gt;</span> prin<span class="token punctuation">.</span><span class="token function">IsInRole</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    <span class="token keyword">await</span> _unauthPipe<span class="token punctuation">.</span><span class="token function">Send</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">await</span> next<span class="token punctuation">.</span><span class="token function">Send</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
+<ol>
+<li>Create the Filter Specification. This will allow you to create the instance of the filter using the configuration data as well as validate the filter usage.</li>
+</ol>
+<pre class="language-"><code class="lang-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AuthorizationFilterSpecification</span><span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> <span class="token punctuation">:</span> IPipeSpecification<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span>
+    <span class="token keyword">where</span> T <span class="token punctuation">:</span> <span class="token keyword">class</span><span class="token punctuation">,</span> PipeContext
+<span class="token punctuation">{</span>
+    <span class="token keyword">readonly</span> IPipe<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> _unauthPipe<span class="token punctuation">;</span>
+    <span class="token keyword">readonly</span> <span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> _allowedRoles<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token function">AuthorizationFilterSpecification</span><span class="token punctuation">(</span>IPipe<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> unauthPipe<span class="token punctuation">,</span> <span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> allowedRoles<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _unauthPipe <span class="token operator">=</span> unauthPipe<span class="token punctuation">;</span>
+        _allowedRoles <span class="token operator">=</span> allowedRoles<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">Apply</span><span class="token punctuation">(</span>IPipeBuilder<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> builder<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        builder<span class="token punctuation">.</span><span class="token function">AddFilter</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">AuthorizationFilter</span><span class="token operator">&lt;</span>T<span class="token operator">&gt;</span><span class="token punctuation">(</span>_unauthPipe<span class="token punctuation">,</span> _allowedRoles<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> IEnumerable<span class="token operator">&lt;</span>ValidationResult<span class="token operator">&gt;</span> <span class="token function">Validate</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>_allowedRoles <span class="token operator">==</span> <span class="token keyword">null</span> <span class="token operator">||</span> <span class="token operator">!</span>_allowedRoles<span class="token punctuation">.</span><span class="token function">Any</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token keyword">yield</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">Failure</span><span class="token punctuation">(</span><span class="token string">&quot;AuthorizationFilter&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;You need to supply at least 1 role&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<ol>
+<li>Write a simple extension method to bring a nice DSL to using your filter by building the specification with a nice configuration syntax.</li>
+</ol>
+<pre class="language-"><code class="lang-csharp"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">AuthorizationFilterExtensions</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token generic-method function">UseAuthorizationFilter<span class="token punctuation">&lt;</span>T<span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token keyword">this</span> IPipeConfigurator<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> cfg<span class="token punctuation">,</span> IPipe<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> unauthPipe<span class="token punctuation">,</span>
+        <span class="token keyword">params</span> <span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> allowedRoles<span class="token punctuation">)</span>
+        <span class="token keyword">where</span> T <span class="token punctuation">:</span> <span class="token keyword">class</span><span class="token punctuation">,</span> PipeContext
+    <span class="token punctuation">{</span>
+        cfg<span class="token punctuation">.</span><span class="token function">AddPipeSpecification</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">AuthorizationFilterSpecification</span><span class="token operator">&lt;</span>T<span class="token operator">&gt;</span><span class="token punctuation">(</span>unauthPipe<span class="token punctuation">,</span> allowedRoles<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<ol>
+<li>Finally lets test it.</li>
+</ol>
+<pre class="language-"><code class="lang-csharp"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Authentication_Specs</span>
+<span class="token punctuation">{</span>
+   IPipe<span class="token operator">&lt;</span>RequestContext<span class="token operator">&gt;</span> _thePipe<span class="token punctuation">;</span>
+   <span class="token keyword">bool</span> protectedBusinessAction<span class="token punctuation">;</span>
+   <span class="token keyword">bool</span> rejected<span class="token punctuation">;</span>
+
+   <span class="token punctuation">[</span>SetUp<span class="token punctuation">]</span>
+   <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">SetUp</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+       protectedBusinessAction <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">;</span>
+       rejected <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">;</span>
+
+       <span class="token keyword">var</span> unauthPipe <span class="token operator">=</span> Pipe<span class="token punctuation">.</span><span class="token generic-method function">New<span class="token punctuation">&lt;</span>RequestContext<span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>cfg <span class="token operator">=</span><span class="token operator">&gt;</span>
+       <span class="token punctuation">{</span>
+           cfg<span class="token punctuation">.</span><span class="token function">UseExecute</span><span class="token punctuation">(</span>cxt <span class="token operator">=</span><span class="token operator">&gt;</span>
+           <span class="token punctuation">{</span>
+               rejected <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">;</span>
+           <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       _thePipe <span class="token operator">=</span> Pipe<span class="token punctuation">.</span><span class="token generic-method function">New<span class="token punctuation">&lt;</span>RequestContext<span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>cfg <span class="token operator">=</span><span class="token operator">&gt;</span>
+       <span class="token punctuation">{</span>
+           <span class="token comment" spellcheck="true">//Unauthorized users will be diverted down the `unauthPipe`</span>
+           cfg<span class="token punctuation">.</span><span class="token function">UseAuthFilter</span><span class="token punctuation">(</span>unauthPipe<span class="token punctuation">,</span> <span class="token string">&quot;bob&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+           <span class="token comment" spellcheck="true">//If you are authorized you will be able to continue down the pipe</span>
+           cfg<span class="token punctuation">.</span><span class="token function">UseExecute</span><span class="token punctuation">(</span>cxt <span class="token operator">=</span><span class="token operator">&gt;</span>
+           <span class="token punctuation">{</span>
+              protectedBusinessAction <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">;</span>
+           <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token punctuation">[</span>TearDown<span class="token punctuation">]</span>
+   <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">TearDown</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+       Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span>_thePipe<span class="token punctuation">.</span><span class="token function">GetProbeResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ToJsonString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token punctuation">[</span>Test<span class="token punctuation">]</span>
+   <span class="token keyword">public</span> <span class="token keyword">async</span> Task <span class="token function">Authenticated</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+       <span class="token keyword">var</span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RequestContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       request<span class="token punctuation">.</span><span class="token function">GetOrAddPayload</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token keyword">new</span> <span class="token class-name">GenericPrincipal</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">GenericIdentity</span><span class="token punctuation">(</span><span class="token string">&quot;Gizmo&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">&quot;bob&quot;</span><span class="token punctuation">}</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       <span class="token keyword">await</span> _thePipe<span class="token punctuation">.</span><span class="token function">Send</span><span class="token punctuation">(</span>request<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ConfigureAwait</span><span class="token punctuation">(</span><span class="token keyword">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       Assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span>protectedBusinessAction<span class="token punctuation">,</span> Is<span class="token punctuation">.</span>True<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       Assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span>rejected<span class="token punctuation">,</span> Is<span class="token punctuation">.</span>False<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token punctuation">[</span>Test<span class="token punctuation">]</span>
+   <span class="token keyword">public</span> <span class="token keyword">async</span> Task <span class="token function">Unauthenticated</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+       <span class="token keyword">var</span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RequestContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       request<span class="token punctuation">.</span><span class="token function">GetOrAddPayload</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token keyword">new</span> <span class="token class-name">GenericPrincipal</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">GenericIdentity</span><span class="token punctuation">(</span><span class="token string">&quot;Gremlin&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">&quot;&quot;</span><span class="token punctuation">}</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       <span class="token keyword">await</span> _thePipe<span class="token punctuation">.</span><span class="token function">Send</span><span class="token punctuation">(</span>request<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ConfigureAwait</span><span class="token punctuation">(</span><span class="token keyword">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       Assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span>protectedBusinessAction<span class="token punctuation">,</span> Is<span class="token punctuation">.</span>False<span class="token punctuation">)</span><span class="token punctuation">;</span>
+       Assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span>rejected<span class="token punctuation">,</span> Is<span class="token punctuation">.</span>True<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token punctuation">[</span>Test<span class="token punctuation">]</span>
+   <span class="token keyword">public</span> <span class="token keyword">async</span> Task <span class="token function">InvalidSetup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+       <span class="token keyword">var</span> unauthPipe <span class="token operator">=</span> Pipe<span class="token punctuation">.</span><span class="token generic-method function">New<span class="token punctuation">&lt;</span>RequestContext<span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>cfg <span class="token operator">=</span><span class="token operator">&gt;</span>
+       <span class="token punctuation">{</span>
+
+       <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       Assert<span class="token punctuation">.</span><span class="token function">That</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">&gt;</span>
+       <span class="token punctuation">{</span>
+           Pipe<span class="token punctuation">.</span><span class="token generic-method function">New<span class="token punctuation">&lt;</span>RequestContext<span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span>cfg <span class="token operator">=</span><span class="token operator">&gt;</span>
+           <span class="token punctuation">{</span>
+               cfg<span class="token punctuation">.</span><span class="token function">UseAuthFilter</span><span class="token punctuation">(</span>authPipe<span class="token punctuation">,</span> unauthPipe<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               cfg<span class="token punctuation">.</span><span class="token function">UseExecute</span><span class="token punctuation">(</span>cxt <span class="token operator">=</span><span class="token operator">&gt;</span>
+               <span class="token punctuation">{</span>
+                   protectedBusinessAction <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+           <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span><span class="token punctuation">,</span> Throws<span class="token punctuation">.</span><span class="token generic-method function">TypeOf<span class="token punctuation">&lt;</span>PipeConfigurationException<span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+   <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">//A random context</span>
+<span class="token comment" spellcheck="true">//Notice: No mention of IPrincipal any where</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RequestContext</span> <span class="token punctuation">:</span>
+   BasePipeContext<span class="token punctuation">,</span>
+   PipeContext
+<span class="token punctuation">{</span>
+   <span class="token keyword">public</span> <span class="token function">RequestContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">:</span> <span class="token keyword">base</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">PayloadCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+   <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="contexts.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Contexts">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Filters","level":"1.4","depth":1,"previous":{"title":"Contexts","level":"1.3","depth":1,"path":"overview/contexts.md","ref":"overview/contexts.md","articles":[]},"dir":"ltr"},"config":{"plugins":["edit-link","prism","-highlight","github","anchorjs","expandable-chapters"],"root":"docs","styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"prism":{},"github":{"url":"https://github.com/MassTransit/Greenipes/"},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"edit-link":{"label":"Edit This Page","base":"https://github.com/MassTransit/GreenPipes/tree/master/docs"},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{},"expandable-chapters":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"GreenPipes","gitbook":"3.2.2"},"file":{"path":"overview/filters.md","mtime":"2017-06-09T13:07:41.760Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-06-09T13:11:08.720Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/3.1.1/anchor.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-anchorjs/anchor-style.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-expandable-chapters/expandable-chapters.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

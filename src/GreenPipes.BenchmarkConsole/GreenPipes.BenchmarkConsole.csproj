@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452</TargetFrameworks>
+		<TargetFrameworks>net45</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AssemblyName>GreenPipes.BenchmarkConsole</AssemblyName>
 		<PackageId>GreenPipes.BenchmarkConsole</PackageId>
@@ -8,7 +8,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\GreenPipes\GreenPipes.csproj" />
 	</ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

@@ -35,7 +35,7 @@ namespace GreenPipes
         }
 
         /// <summary>
-        /// Create an retry policy that never retries.
+        /// Create a retry policy that never retries.
         /// </summary>
         /// <param name="configurator"></param>
         /// <returns></returns>

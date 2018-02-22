@@ -35,8 +35,7 @@ namespace GreenPipes
         }
 
         /// <summary>
-        /// Create an immediate retry policy with the specified number of retries, with no
-        /// delay between attempts.
+        /// Create a retry policy that never retries.
         /// </summary>
         /// <param name="configurator"></param>
         /// <returns></returns>

@@ -32,7 +32,6 @@ namespace GreenPipes.BenchmarkConsole
     {
         readonly string _saveLocation;
         Process _process;
-        Process profiler;
 
         public DotTraceDiagnoser()
         {
@@ -43,14 +42,11 @@ namespace GreenPipes.BenchmarkConsole
         public IColumnProvider GetColumnProvider() => EmptyColumnProvider.Instance;
 
         /// <inheritdoc />
-        public RunMode GetRunMode(Benchmark benchmark) => RunMode.ExtraRun;
-
-        /// <inheritdoc />
         public void Handle(HostSignal signal, DiagnoserActionParameters parameters)
         {
             switch (signal)
             {
-                case HostSignal.BeforeMainRun:
+                case HostSignal.BeforeActualRun:
                     try
                     {
                         var startInfo = new ProcessStartInfo(
@@ -84,7 +80,7 @@ namespace GreenPipes.BenchmarkConsole
                         throw;
                     }
                     break;
-                case HostSignal.AfterMainRun:
+                case HostSignal.AfterActualRun:
                     break;
                 case HostSignal.BeforeAnythingElse:
                     break;
@@ -110,6 +106,9 @@ namespace GreenPipes.BenchmarkConsole
         /// <inheritdoc />
         public IEnumerable<ValidationError> Validate(ValidationParameters validationParameters) =>
             Enumerable.Empty<ValidationError>();
+
+        /// <inheritdoc />
+        public RunMode GetRunMode(BenchmarkCase benchmarkCase) => RunMode.ExtraRun;
 
         /// <inheritdoc />
         public IEnumerable<string> Ids => new[] {nameof(DotTraceDiagnoser)};

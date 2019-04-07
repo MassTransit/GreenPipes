@@ -13,12 +13,12 @@
         public AgentBenchmarkConfig()
         {
             Add(MemoryDiagnoser.Default);
-            Add(new Job
+            Add(new Job()
             {
-                Env = {Runtime = Runtime.Core},
+                Environment = {Runtime = Runtime.Core},
                 Run =
                 {
-                    TargetCount = 2,
+                    IterationCount = 2,
                     RunStrategy = RunStrategy.Throughput,
                     WarmupCount = 1,
                     LaunchCount = 1,

@@ -45,15 +45,14 @@ public class AuthorizationFilter<T> : IFilter<T>
         public async Task Send(T context, IPipe<T> next)
         {
             IPrincipal prin;
-            if (context.TryGetPayload(out prin))
+            if (context.TryGetPayload(out prin) && _allowedRoles.Any(r => prin.IsInRole(r))
             {
-                if (!_allowedRoles.Any(r => prin.IsInRole(r)))
-                {
-                    await _unauthPipe.Send(context);
-                }
+                await next.Send(context);
             }
-
-            await next.Send(context);
+            else
+            {
+                await _unauthPipe.Send(context);
+            }
         }
     }
 ```

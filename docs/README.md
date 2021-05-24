@@ -14,4 +14,4 @@ To get a quick idea about GreenPipes, have a look at Dru Sellers'
 
 
 
-[1]: https://drusellers.com/greenpipes/2016/10/30/greenpipes.html
+[1]: https://drusellers.com/posts/greenpipes
